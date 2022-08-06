@@ -1,46 +1,21 @@
 pipeline {
-    node('docker'){
+    agent any
+
     stages {
-        stage('Build') {
-            agent {
-                docker {
-                    image 'python:2-alpine'
-                }
-            }
+        stage('Сборка') {
             steps {
-                sh 'python -m py_compile sources/add2vals.py sources/calc.py'
+                echo 'Выполняем команды для сборки'
             }
         }
-        stage('Test') {
-            agent {
-                docker {
-                    image 'qnib/pytest'
-                }
-            }
+        stage('Тестирование') {
             steps {
-                sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
-            }
-            post {
-                always {
-                    junit 'test-reports/results.xml'
-                }
+                echo 'Тестируем нашу сборку'
             }
         }
-        stage('Deliver') {
-            agent {
-                docker {
-                    image 'cdrx/pyinstaller-linux:python2'
-                }
-            }
+        stage('Развертывание') {
             steps {
-                sh 'pyinstaller --onefile sources/add2vals.py'
-            }
-            post {
-                success {
-                    archiveArtifacts 'dist/add2vals'
-                }
+                echo 'Переносим код в рабочую среду или создаем артефакт'
             }
         }
     }
-}
 }
